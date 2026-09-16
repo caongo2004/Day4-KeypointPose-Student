@@ -30,31 +30,27 @@ chứng nhìn thấy thay vì chỉ nêu cảm giác. -->
 
 ## 2. Chấm với gold
 
-<!-- Lấy hai cột từ outputs/eval_vs_gold.json: một lần ngay khi protected release mở và một
-lần sau rework. Đếm số phần tử trong từng danh sách lỗi, không tự làm tròn. -->
+| Chỉ số                |                   Trước rework |    Sau rework |
+| --------------------- | -----------------------------: | ------------: |
+| OKS trung bình        |                          0.913 | Chưa chạy lại |
+| OKS@0.50              |                          0.966 | Chưa chạy lại |
+| OKS@0.75              |                          0.966 | Chưa chạy lại |
+| Lỗi `dao_trai_phai`   |                              0 | Chưa chạy lại |
+| Lỗi `nham_nguoi`      |                              3 | Chưa chạy lại |
+| Lỗi `xoa_khop_bi_che` | Chưa thấy trong output tóm tắt | Chưa chạy lại |
 
-| Chỉ số | Trước rework | Sau rework |
-| --- | ---: | ---: |
-| OKS trung bình | | |
-| OKS@0.50 | | |
-| OKS@0.75 | | |
-| Lỗi `dao_trai_phai` | | |
-| Lỗi `nham_nguoi` | | |
-| Lỗi `xoa_khop_bi_che` | | |
+**Các lỗi chính cần rework**
 
-**Tôi đã sửa gì giữa hai lần chạy** (ghi cụ thể: ảnh nào, người thứ mấy, khớp nào):
+* Ảnh `train_13.jpg`, người #1: thiếu hẳn một người, OKS = **0.000**. Cần bổ sung đầy đủ skeleton 17 keypoint cho người bị thiếu.
+* Ảnh `train_04.jpg`, người #1, `left_wrist`: bị **nhầm người**, keypoint rơi sang cơ thể bên cạnh. Cần chuyển `left_wrist` về đúng người.
+* Ảnh `train_03.jpg`, người #1, `left_hip` và `right_hip`: bị **nhầm người**, hai keypoint hông rơi sang người bên cạnh. Cần đặt lại hai điểm hông trên đúng cơ thể.
 
-<!-- Mỗi dòng phải có: tên ảnh + người thứ mấy + keypoint + thao tác sửa. Không viết “đã sửa
-lại một số lỗi”. -->
+Ngoài ra kết quả còn ghi nhận **13 lỗi lệch nhẹ**, **43 trường hợp cờ visibility khác gold nhưng vị trí vẫn đúng**, và **72 trường hợp gold để `v=0` trong khi tôi có gán keypoint**. Hai nhóm sau không bị trừ điểm OKS.
 
--
--
--
+**Lỗi đảo trái/phải của tôi xảy ra ở ảnh nào?**
 
-**Lỗi đảo trái/phải của tôi xảy ra ở ảnh nào?** Ảnh đó dễ hay khó? Nếu là ảnh dễ,
-bạn nghĩ vì sao mình vẫn sai?
+Không có lỗi đảo trái/phải được liệt kê trong kết quả chấm hiện tại.
 
-<!-- Nếu không có lỗi, ghi rõ “Không có lỗi đảo trái/phải trong toàn bộ 20 ảnh.” -->
 
 ## 3. Kiểm chéo
 
@@ -76,40 +72,71 @@ Không chỉ ghi “cẩn thận hơn khi gán”. -->
 
 ## 4. Model
 
-<!-- Chép số từ outputs/eval_model.json sau Chặng 6. “Chênh” = sau fine-tune trừ baseline;
-đây là quan sát trên tập test, không phải chất lượng sản phẩm. -->
+| Chỉ số         | yolo26n-pose gốc | Sau fine-tune |   Chênh |
+| -------------- | ---------------: | ------------: | ------: |
+| pose_mAP50     |           0.8450 |        0.8450 | +0.0000 |
+| pose_mAP50-95  |           0.6853 |        0.6908 | +0.0055 |
+| pose_precision |           0.9734 |        0.9792 | +0.0058 |
+| pose_recall    |           0.8462 |        0.8462 | +0.0000 |
+| box_mAP50-95   |           0.8119 |        0.8041 | -0.0078 |
 
-| Chỉ số | yolo26n-pose gốc | Sau fine-tune | Chênh |
-| --- | ---: | ---: | ---: |
-| pose_mAP50 | | | |
-| pose_mAP50-95 | | | |
-| pose_precision | | | |
-| pose_recall | | | |
-| box_mAP50-95 | | | |
+Sau fine-tune, `pose_mAP50-95` tăng 0.0055 và `pose_precision` tăng 0.0058, trong khi `pose_mAP50` và `pose_recall` không thay đổi. `box_mAP50-95` giảm 0.0078. Đây chỉ là kết quả quan sát trên tập test của bài thực hành, không phải kết luận về chất lượng sản phẩm thực tế.
 
 ### Trả lời năm câu hỏi ở cuối notebook
 
 > Mỗi câu cần trỏ tới ảnh/chỉ số cụ thể. Một con số thấp không tự chứng minh nhãn sai;
 > kiểm lại bằng bằng chứng thị giác và kết quả gold.
 
-1. `pose_mAP50-95` thay đổi bao nhiêu? Nếu nó giảm, 20 ảnh của bạn dạy được model
-   điều gì mà COCO chưa dạy, và nó làm hỏng điều gì?
+1. pose_mAP50-95 thay đổi bao nhiêu sau fine-tune?
 
-2. `box_mAP` và `pose_mAP` chênh nhau bao nhiêu? Model tìm *người* dễ hơn hay tìm
-   *khớp* dễ hơn? Vì sao?
+pose_mAP50-95 tăng từ 0.6853 lên 0.6908.
 
-3. Một ảnh test model đoán sai - gọi tên lỗi theo bốn loại của slide 43
-   (lệch nhẹ / đảo trái/phải / nhầm người / trượt hẳn):
+Mức thay đổi:
 
-4. Ảnh nào có OKS thấp nhất giữa nhãn của bạn và model? Ai đúng, và bạn dựa vào đâu?
++0.0055
+tương đương khoảng +0.55 điểm phần trăm.
 
-5. Ảnh bạn gán tệ nhất có *cũng* là ảnh model đoán tệ nhất không? Nếu có, điều đó
-   nói gì về bức ảnh đó?
+Vì chỉ số này tăng chứ không giảm nên không cần trả lời phần giả định “nếu nó giảm”.
+
+2. box_mAP và pose_mAP chênh nhau bao nhiêu? Model tìm người hay tìm khớp dễ hơn?
+
+Sau fine-tune:
+
+box_mAP50-95 = 0.8041
+pose_mAP50-95 = 0.6908
+
+Chênh lệch:
+
+0.8041 - 0.6908 = 0.1133
+
+Tức box_mAP50-95 cao hơn khoảng 11.33 điểm phần trăm.
+
+Model tìm người dễ hơn tìm chính xác các khớp, vì bounding box chỉ cần xác định vùng chứa người, còn pose phải xác định chính xác nhiều keypoint nhỏ như mắt, tai, cổ tay, đầu gối và mắt cá chân.
+
+### 3. Một ảnh test model đoán sai - gọi tên lỗi theo bốn loại của slide 43
+
+Chưa đủ bằng chứng để gọi tên chính xác lỗi của model theo bốn loại chỉ từ bảng OKS. Cần mở ảnh prediction/overlay để xác định đó là `lệch nhẹ`, `đảo trái/phải`, `nhầm người` hay `trượt hẳn`.
+
+### 4. Ảnh nào có OKS thấp nhất giữa nhãn của tôi và model?
+
+Ảnh có OKS thấp nhất là **`train_11` — OKS = 0.558**.
+
+Điều này cho thấy model và nhãn của tôi bất đồng nhiều nhất ở `train_11`. Tuy nhiên, OKS thấp chỉ cho biết hai bên khác nhau, không tự chứng minh model hay nhãn của tôi sai. Kết quả chấm với gold cho thấy ba skeleton cần sửa trước nằm ở `train_13`, `train_04` và `train_03`, vì vậy chưa có đủ bằng chứng để kết luận bên nào đúng ở `train_11`.
+
+### 5. Ảnh tôi gán tệ nhất có cũng là ảnh model đoán tệ nhất không?
+
+**Không.**
+
+Theo kết quả chấm nhãn của tôi với gold, ảnh tôi gán tệ nhất là **`train_13.jpg`, người #1**, với **OKS = 0.000** do **thiếu hẳn một người**.
+
+Trong khi đó, khi so model với nhãn của tôi, ảnh có OKS thấp nhất là **`train_11` với OKS = 0.558**.
+
+Như vậy ảnh tôi gán tệ nhất và ảnh model bất đồng với tôi nhiều nhất không phải cùng một ảnh. Điều này cho thấy lỗi annotation của tôi và lỗi/bất đồng của model không nhất thiết xuất hiện ở cùng một tình huống.
+
 
 ## 5. Một rule evidence bạn đã dùng
 
-Chọn một keypoint trong ảnh core mà bạn phải quyết định giữa `v=1` và `v=0`. Nêu ảnh, người,
-khớp, bằng chứng nhìn thấy và lý do chọn trạng thái đó trong 3-5 câu.
+Ở ảnh 1, người thứ 2, khớp gối, tôi phải quyết định giữa v=1 và v=0. Quan sát ảnh cho thấy khớp vừa giống nằm trong ảnh những cũng giống nằm ngaoif. Vì khớp vẫn nằm trong khung ảnh nhưng bị che và có thể ước lượng được vị trí nên tôi chọn v=1 và vẫn đặt chấm. Nếu vị trí giải phẫu của khớp đã nằm ngoài mép ảnh thì tôi mới sử dụng v=0 và không đặt chấm.
 
 <!-- Cấu trúc gợi ý: (1) train_XX + người thứ mấy + keypoint; (2) căn cứ thị giác như phần cơ
 thể liền kề, trang phục hoặc vật che; (3) vì sao khớp còn trong khung (v=1) hay đã ra khỏi
