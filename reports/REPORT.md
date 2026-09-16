@@ -1,30 +1,29 @@
 # Báo cáo Ngày 4 - Keypoint & Pose
 
-Họ tên: ______   Nhóm: ______   Ngày: ______
+Họ tên: Ngô Văn Cao   Nhóm: ______   Ngày: 16/9/2026
 
 > Cách dùng: copy file này thành `reports/REPORT.md`. Điền bằng số liệu do công cụ sinh ra;
 > không tự ước lượng hoặc sửa số trong file JSON.
 
 ## 1. Nhãn của tôi
 
-<!-- Lấy số từ reports/visibility_report.md hoặc outputs/visibility_report.json sau Chặng 4.
-Số ảnh phải là 20; số skeleton là tổng số người trong 20 ảnh. Thời gian trung bình = tổng
-thời gian gán / 20. -->
+| Chỉ số                       |         Giá trị |
+| ---------------------------- | --------------: |
+| Số ảnh đã gán                |              20 |
+| Số skeleton                  |              28 |
+| v=2 / v=1 / v=0              |   366 / 87 / 23 |
+| Thời gian trung bình mỗi ảnh | Chưa có dữ liệu |
 
-| Chỉ số | Giá trị |
-| --- | ---: |
-| Số ảnh đã gán | |
-| Số skeleton | |
-| v=2 / v=1 / v=0 | |
-| Thời gian trung bình mỗi ảnh | |
+Ba khớp có `%v=1` cao nhất:
 
-Ba khớp có `%v=1` cao nhất (chép từ `reports/visibility_report.md`):
+1. `left_ear`: 36%
+2. `left_eye`: 25%
+3. `right_ear`: 25%
 
-1.
-2.
-3.
+Ngoài ra, `right_knee` và `right_ankle` cũng có `%v=1 = 25%`, nên đang đồng hạng với `left_eye` và `right_ear`.
 
-Chúng có đúng là những khớp bạn thấy khó gán nhất không? Nếu không, giải thích.
+Các khớp này nhìn chung đúng là những vị trí tương đối khó gán. Đặc biệt, tai và mắt dễ bị tóc, mũ, góc quay của đầu hoặc vật thể khác che khuất nên thường phải ước lượng vị trí và sử dụng `v=1`. Tuy nhiên, trong quá trình gán tôi cũng thấy các khớp ở đầu gối và mắt cá chân khó xử lý, nhất là khi người bị cắt ở mép ảnh hoặc phần chân bị vật thể khác che. Vì vậy mức độ khó khi gán không chỉ thể hiện qua `%v=1`, mà còn liên quan đến các trường hợp phải phân biệt giữa `v=1` và `v=0`.
+
 
 <!-- Trả lời 2–4 câu. Phân biệt “hay bị che” với “khó xác định vị trí giải phẫu”; nêu bằng
 chứng nhìn thấy thay vì chỉ nêu cảm giác. -->
